@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include <sstream>
+#include <iomanip>
 
 #include "funkcijos.h"
 
@@ -20,6 +21,26 @@ using std::ifstream;
 using std::vector;
 using std::map;
 using std::stringstream;
+using std::setw;
+using std::left;
+using std::ofstream;
+
+
+//using std::wstring;
+//using std::wcout;
+//wstring sutvarkyti_zodziai(const wstring& zodis){
+//    wstring rezultatas;
+//    locale lt("lt_LT.UTF-8");
+//    const ctype<wchar_t>& facet = use_facet<ctype<wchar_t>>(lt);
+//
+//       for (wchar_t c : zodis) {
+//           if (facet.is(std::ctype_base::alpha, c)) {
+//               rezultatas += facet.tolower(c);
+//           }
+//       }
+//       return rezultatas;
+//}
+
 
 string sutvarkyti_zodziai(const string& zodis) {
     string rezultatas;
@@ -31,16 +52,23 @@ string sutvarkyti_zodziai(const string& zodis) {
     return rezultatas;
 }
 
-vector<string> txt_skaitymas(const string& failo_pavadinimas){
+vector<string> failo_skaitymas(const string& failo_pavadinimas){
     ifstream in(failo_pavadinimas);
     if (!in.is_open()) {
         cout << "Nepavyko atidaryti failo: " << failo_pavadinimas << endl;
+        return {};
     }
     
     vector<string> eilutes;
     string eilute;
+    
     while (getline(in, eilute)) {
-        eilutes.push_back(eilute);
+        if (!eilute.empty()) {
+            eilutes.push_back(eilute);
+        }
+    }
+    if (eilutes.empty()) {
+        cout << "Failas " << failo_pavadinimas << " yra tuščias" << endl;
     }
 
     in.close();
@@ -65,5 +93,51 @@ map<string, Zodziai> zodziu_skaiciavimas(const vector<string>& eilutes) {
         }
     }
     return zodziu_duomenys;
+}
+
+
+void cross_reference_terminalas(const map<string, Zodziai>& zodziai) {
+    cout << "----- Cross reference lentele -----\n\n";
+
+    cout << setw(15) << left << "Žodis " << "| " << setw (7) << left << "Kartai " << "| " << left << "Eilučių nr." << endl;
+    cout << "-------------------------------------------------------------------------------------" << endl;
+    for (const auto& [zodis, duomenys] : zodziai) {
+        if (duomenys.count > 1) {
+            cout << setw(13) << left << zodis << " | " << setw(6) << left << duomenys.count << " | ";
+
+            for (int nr : duomenys.eilutes_nr) {
+                cout << nr << " ";
+            }
+            cout << endl;
+        }
+    }
+}
+
+
+void cross_reference_i_faila(const map<string, Zodziai>& zodziai, const string& failo_vardas) {
+
+    ofstream out(failo_vardas);
+    if (!out.is_open()) {
+        cout << "Nepavyko sukurti failo" << endl;
+        return;
+    }
+
+    out << "----- Cross reference lentele -----\n\n";
+
+    out << setw(15) << left << "Žodis " << "| " << setw (7) << left << "Kartai " << "| " << left << "Eilučių nr." << endl;
+    out << "-------------------------------------------------------------------------------------" << endl;
+    
+    for (const auto& [zodis, duomenys] : zodziai) {
+        if (duomenys.count > 1) {
+            out << setw(13) << left << zodis << " | " << setw(6) << left << duomenys.count << " | ";
+
+            for (int nr : duomenys.eilutes_nr) {
+                out << nr << " ";
+            }
+            out << endl;
+        }
+    }
+
+    out.close();
 }
 
