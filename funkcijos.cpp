@@ -21,23 +21,6 @@ using std::vector;
 using std::map;
 using std::stringstream;
 
-
-//using std::wstring;
-//using std::wcout;
-//wstring sutvarkyti_zodziai(const wstring& zodis){
-//    wstring rezultatas;
-//    locale lt("lt_LT.UTF-8");
-//    const ctype<wchar_t>& facet = use_facet<ctype<wchar_t>>(lt);
-//
-//       for (wchar_t c : zodis) {
-//           if (facet.is(std::ctype_base::alpha, c)) {
-//               rezultatas += facet.tolower(c);
-//           }
-//       }
-//       return rezultatas;
-//}
-
-
 string sutvarkyti_zodziai(const string& zodis) {
     string rezultatas;
     for (char c : zodis) {
