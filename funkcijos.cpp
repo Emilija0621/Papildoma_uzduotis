@@ -8,49 +8,56 @@
 #include <sstream>
 #include <iomanip>
 
-#include "funkcijos.h"
-
 using std::cout;
 using std::locale;
-using std::iswalpha;
-using std::towlower;
 using std::ctype;
 using std::endl;
-using std::string;
-using std::ifstream;
 using std::vector;
 using std::map;
-using std::stringstream;
 using std::setw;
 using std::left;
-using std::ofstream;
+using std::wcout;
+using std::wstring;
+using std::wcout;
+using std::wofstream;
+using std::wifstream;
+using std::wstringstream;
+
+#include "funkcijos.h"
 
 
-string sutvarkyti_zodziai(const string& zodis) {
-    string rezultatas;
-    for (char c : zodis) {
-        if (isalpha(c)) {
-            rezultatas += tolower(c);
-        }
-    }
-    return rezultatas;
+wstring sutvarkyti_zodziai(const wstring& zodis){
+    wstring rezultatas;
+    locale lt("lt_LT.UTF-8");
+    const ctype<wchar_t>& facet = use_facet<ctype<wchar_t>>(lt);
+
+       for (wchar_t c : zodis) {
+           if (facet.is(std::ctype_base::alpha, c)) {
+               rezultatas += facet.tolower(c);
+           }
+       }
+       return rezultatas;
 }
 
-vector<string> failo_skaitymas(const string& failo_pavadinimas){
-    ifstream in(failo_pavadinimas);
+
+vector<wstring> failo_skaitymas(const string& failo_pavadinimas){
+    wifstream in(failo_pavadinimas);
+    in.imbue(locale("lt_LT.UTF-8"));
+
     if (!in.is_open()) {
         cout << "Nepavyko atidaryti failo: " << failo_pavadinimas << endl;
         return {};
     }
-    
-    vector<string> eilutes;
-    string eilute;
-    
+
+    vector<wstring> eilutes;
+    wstring eilute;
+
     while (getline(in, eilute)) {
         if (!eilute.empty()) {
             eilutes.push_back(eilute);
         }
     }
+
     if (eilutes.empty()) {
         cout << "Failas " << failo_pavadinimas << " yra tuščias" << endl;
     }
@@ -59,69 +66,70 @@ vector<string> failo_skaitymas(const string& failo_pavadinimas){
     return eilutes;
 }
 
-map<string, Zodziai> zodziu_skaiciavimas(const vector<string>& eilutes) {
-    map<string, Zodziai> zodziu_duomenys;
-    int eilute_nr = 0;
 
-    for (const auto& eilute : eilutes) {
-        eilute_nr++;
-        stringstream ss(eilute);
-        string zodis;
+void cross_reference_terminalas(const map<wstring, int>& zodziu_skaicius, const map<wstring, vector<int>>& zodziu_eilutes) {
+    wcout << L"----- Cross reference lentele -----\n\n";
+    wcout << left << setw(15) << L"Žodis" << L"| " << setw(7) << L"Kartai" << L"| " << L"Eilučių nr." << endl;
 
-        while (ss >> zodis) {
-            string sutvarkyta = sutvarkyti_zodziai(zodis);
-            if (!sutvarkyta.empty()) {
-                zodziu_duomenys[sutvarkyta].count++;
-                zodziu_duomenys[sutvarkyta].eilutes_nr.insert(eilute_nr);
+    wcout << L"-------------------------------------------------------------------------------------\n";
+
+    for (const auto& [zodis, kiekis] : zodziu_skaicius) {
+        if (kiekis > 1) {
+            wcout << left << setw(15) << zodis << L"| " << setw(7) << kiekis << L"| ";
+
+            for (int nr : zodziu_eilutes.at(zodis)) {
+                wcout << nr << L" ";
             }
-        }
-    }
-    return zodziu_duomenys;
-}
-
-
-void cross_reference_terminalas(const map<string, Zodziai>& zodziai) {
-    cout << "----- Cross reference lentele -----\n\n";
-
-    cout << setw(15) << left << "Žodis " << "| " << setw (7) << left << "Kartai " << "| " << left << "Eilučių nr." << endl;
-    cout << "-------------------------------------------------------------------------------------" << endl;
-    for (const auto& [zodis, duomenys] : zodziai) {
-        if (duomenys.count > 1) {
-            cout << setw(13) << left << zodis << " | " << setw(6) << left << duomenys.count << " | ";
-
-            for (int nr : duomenys.eilutes_nr) {
-                cout << nr << " ";
-            }
-            cout << endl;
+            wcout << L"\n";
         }
     }
 }
 
 
-void cross_reference_i_faila(const map<string, Zodziai>& zodziai, const string& failo_vardas) {
+void cross_reference_i_faila(const map<wstring, int>& zodziu_skaicius, const map<wstring, vector<int>>& zodziu_eilutes, const string& failo_vardas) {
+    wofstream out(failo_vardas);
+    out.imbue(locale("lt_LT.UTF-8"));
 
-    ofstream out(failo_vardas);
     if (!out.is_open()) {
         cout << "Nepavyko sukurti failo" << endl;
         return;
     }
 
-    out << "----- Cross reference lentele -----\n\n";
+    out << L"----- Cross reference lentele -----\n\n";
+    out << left << setw(15) << L"Žodis" << L"| " << setw(7) << L"Kartai" << L"| " << L"Eilučių nr." << endl;
 
-    out << setw(15) << left << "Žodis " << "| " << setw (7) << left << "Kartai " << "| " << left << "Eilučių nr." << endl;
-    out << "-------------------------------------------------------------------------------------" << endl;
-    
-    for (const auto& [zodis, duomenys] : zodziai) {
-        if (duomenys.count > 1) {
-            out << setw(13) << left << zodis << " | " << setw(6) << left << duomenys.count << " | ";
+    out << L"-------------------------------------------------------------------------------------\n";
 
-            for (int nr : duomenys.eilutes_nr) {
-                out << nr << " ";
+    for (const auto& [zodis, kiekis] : zodziu_skaicius) {
+        if (kiekis > 1) {
+            out << left << setw(15) << zodis << L"| "
+                << setw(7) << kiekis << L"| ";
+
+            for (int nr : zodziu_eilutes.at(zodis)) {
+                out << nr << L" ";
             }
-            out << endl;
+            out << L"\n";
         }
     }
 
     out.close();
 }
 
+void analizuoti_teksta(const vector<wstring>& eilutes, map<wstring, int>& zodziu_skaicius, map<wstring, vector<int>>& zodziu_eilutes) {
+    int eilutes_nr = 0;
+
+    for (const auto& eilute : eilutes) {
+        eilutes_nr++;
+        wstringstream ss(eilute);
+        wstring zodis;
+
+        while (ss >> zodis) {
+            wstring tvarkingas = sutvarkyti_zodziai(zodis);
+
+            if (!tvarkingas.empty()) {
+                zodziu_skaicius[tvarkingas]++;
+                zodziu_eilutes[tvarkingas].push_back(eilutes_nr);
+            }
+        }
+    }
+}
