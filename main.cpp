@@ -23,7 +23,7 @@ int main() {
     locale::global(locale("lt_LT.UTF-8"));
     // Nustatome wcout, kad galėtume spausdinti lietuviškas raides
     wcout.imbue(locale("lt_LT.UTF-8"));
-    
+
     while (true) {
         int pasirinkimas = 0;
 
@@ -31,6 +31,7 @@ int main() {
             cout << "Pasirinkite veiksmą: " << endl;
             cout << "1 - Tekste rasti pasikartojančius žodžius" << endl;
             cout << "2 - Tekste rasti URL" << endl;
+            cout << "3 - Išeiti iš programos" << endl;
             cout << "Pasirinkimas: ";
 
             string ivestis;
@@ -38,11 +39,18 @@ int main() {
 
             try {
                 pasirinkimas = stoi(ivestis);
-                if (pasirinkimas == 1 || pasirinkimas == 2) break;
+                if (pasirinkimas == 1 || pasirinkimas == 2 || pasirinkimas == 3) break;
             } catch (...) {}
 
             cout << "Neteisingas pasirinkimas. Bandykite dar kartą." << endl;
         }
+        
+        if (pasirinkimas == 3) {
+                    cout << "Programa baigta. Visos geros dienos!" << endl;
+                    break;
+                }
+        
+        
         string failas;
         vector<wstring> eilutes;
 
@@ -55,19 +63,19 @@ int main() {
 
             cout << "Bandykite dar kartą." << endl;
         }
-        
+
         if (pasirinkimas == 1) {
-            
+
             // Asociatyvūs konteineriai
-            
+
             // Žodis, kiek kartų pasikartojo
             map<wstring, int> zodziu_skaicius;
-            
+
             // Žodis, eilutėse numeriai
             map<wstring, vector<int>> zodziu_eilutes;
-            
+
             analizuoti_teksta(eilutes, zodziu_skaicius, zodziu_eilutes);
-            
+
             int pasirinkimas1 = 0;
             while (true) {
                 cout << "Kaip norite gauti rezultatus?" << endl;
@@ -107,7 +115,7 @@ int main() {
                 cout << "1 - į konsolę" << endl;
                 cout << "2 - į failą" << endl;
                 cout << "Pasirinkimas: ";
-                
+
                 string ivestis;
                 cin >> ivestis;
                 try {
@@ -126,9 +134,8 @@ int main() {
                 url_failas(urlai, isv_failas);
             }
         }
- 
+
     }
+
     return 0;
 }
-
-
