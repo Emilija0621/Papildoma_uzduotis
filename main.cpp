@@ -46,7 +46,7 @@ int main() {
         }
         
         if (pasirinkimas == 3) {
-                    cout << "Programa baigta. Visos geros dienos!" << endl;
+                    cout << "Programa baigta." << endl;
                     break;
                 }
         
