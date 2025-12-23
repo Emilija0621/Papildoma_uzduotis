@@ -5,7 +5,7 @@
 Ši programa skirta analizuoti tekstą iš failo (pavadinimas.txt) ir atlikti du pagrindinius veiksmus:
 
 #### Pasikartojančių žodžių analizė: <br>
-- Suskaičiuoja, kiek kartų kiekvienas žodis pasikartoja tekste.
+- Suskaičiuoja, kiek kartų kiekvienas žodis (tekste esantis daugiau nei 1 kartą) pasikartoja tekste.
 - Generuoja cross-reference lentelę, kurioje nurodoma, kiek kartų bei kuriose teksto eilutėse pasikartojantys žodžiai buvo paminėti.
 
 #### URL paieška tekste:
