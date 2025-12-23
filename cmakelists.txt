@@ -1,0 +1,14 @@
+cmake_minimum_required(VERSION 3.10)
+project(egzamizas)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+file(GLOB CPP_H_FILES "*.cpp" "*.h")
+
+file(GLOB TXT_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.txt")
+
+add_executable(egzaminas ${CPP_H_FILES})
+
+file(COPY ${TXT_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
