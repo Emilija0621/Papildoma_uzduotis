@@ -96,7 +96,6 @@ void analizuoti_teksta(const vector<wstring>& eilutes, map<wstring, int>& zodziu
 
 
 void cross_reference_terminalas(const map<wstring, int>& zodziu_skaicius, const map<wstring, vector<int>>& zodziu_eilutes) {
-    
     wcout << L"----- Cross reference lentele -----\n\n";
     wcout << left << setw(5)  << L"Nr." << L"| " << setw(15) << L"Žodis" << L"| " << setw(7)  << L"Kartai" << L"| " << L"Eilučių nr." << endl;
 
@@ -159,6 +158,4 @@ void cross_reference_i_faila(const map<wstring, int>& zodziu_skaicius, const map
 
     out.close();
 }
-
-
 
