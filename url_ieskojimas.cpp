@@ -66,7 +66,6 @@ set<wstring> nuskaityti_tlds(const string& failo_pavadinimas) {
     return url;
 }
 
-
 wstring sutvarkyti_url(const wstring& url) {
     wstring rezultatas = url;
 
@@ -85,17 +84,17 @@ wstring sutvarkyti_url(const wstring& url) {
     return rezultatas;
 }
 
-
 bool ar_tld(const wstring& zodis, const set<wstring>& tlds) {
-    
     wstring lower = mazosios_raides(zodis);
+
     size_t pos = lower.rfind(L'.');
-    
+
     if (pos == wstring::npos) {
-        // jei viso žodžio nėra taško, galima leisti Punycode vieną segmentą
-        return lower.rfind(L"xn--") == 0; // jei prasideda 'xn--', laikome galiojančiu
+        return tlds.find(lower) != tlds.end();
     }
-    if (pos == 0 || pos == lower.size() - 1) return false;
+
+    if (pos == 0 || pos == lower.size() - 1)
+        return false;
 
     wstring ending = lower.substr(pos + 1);
     return tlds.find(ending) != tlds.end();
@@ -103,34 +102,24 @@ bool ar_tld(const wstring& zodis, const set<wstring>& tlds) {
 
 
 
+
 set<wstring> surasti_url(const vector<wstring>& eilutes, const set<wstring>& tlds) {
     set<wstring> urls;
 
-    wregex http_regex(L"(https?://[\\w\\-./]+)");
-    wregex www_regex(L"(www\\.[\\w\\-./]+)");
-    wregex betkoks_regex(L"[\\w\\-]+(\\.[\\w\\-]+)+");
+    wregex url_regex(
+        L"(https?://[\\w\\-\\.]+)|"
+        L"(www\\.[\\w\\-\\.]+)|"
+        L"([\\w\\-]+(\\.[\\w\\-]+)+)|"
+        L"(xn--[\\w\\-]+(\\.[\\w\\-]+)*)"
+    );
+    
 
-    for (wstring eilute : eilutes) {
-
-        for (auto it = wsregex_iterator(eilute.begin(), eilute.end(), http_regex);
-             it != wsregex_iterator(); ++it) {
-
-            urls.insert(sutvarkyti_url(it->str()));
-
-            eilute.replace(it->position(), it->length(), L" ");
-        }
-
-        for (auto it = wsregex_iterator(eilute.begin(), eilute.end(), www_regex);
-             it != wsregex_iterator(); ++it) {
-
-            urls.insert(sutvarkyti_url(it->str()));
-            eilute.replace(it->position(), it->length(), L" ");
-        }
-
-        for (auto it = wsregex_iterator(eilute.begin(), eilute.end(), betkoks_regex);
+    for (const auto& eilute : eilutes) {
+        for (auto it = wsregex_iterator(eilute.begin(), eilute.end(), url_regex);
              it != wsregex_iterator(); ++it) {
 
             wstring valytas = sutvarkyti_url(it->str());
+
             if (ar_tld(valytas, tlds)) {
                 urls.insert(valytas);
             }
@@ -139,6 +128,9 @@ set<wstring> surasti_url(const vector<wstring>& eilutes, const set<wstring>& tld
 
     return urls;
 }
+
+
+
 
 void url_terminalas(const set<wstring>& urls) {
     wcout << L"----- Surasti URL -----\n\n";
